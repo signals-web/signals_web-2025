@@ -21,5 +21,5 @@ export type Project = Entry<ProjectSkeleton>;
 // Export a type for the getEntries query
 export interface ProjectQuery {
   content_type: 'project';
-  'fields.type'?: ChainModifiers<'Book' | 'Sign'>;
+  'fields.type'?: 'Book' | 'Sign';
 } 
