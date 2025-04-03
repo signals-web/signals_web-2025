@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import PageLayout from '../../components/PageLayout'
 import ImageCarousel from '../../components/ImageCarousel'
+import { Project, ProjectFields } from '@/lib/contentful'
+import { Asset } from 'contentful'
 
 // Tailwind colors to cycle through - simplified list
 const colors = [
@@ -19,9 +21,9 @@ const colors = [
 const useDarkText = new Set(['bg-signals-gray', 'bg-signals-slate'])
 
 interface ProjectClientProps {
-  project: any // TODO: Add proper type
-  prevProject?: { sys: { id: string }, fields: { title: string } }
-  nextProject?: { sys: { id: string }, fields: { title: string } }
+  project: Project
+  prevProject?: Project
+  nextProject?: Project
 }
 
 // Helper function to get a random color that's different from the current one
@@ -32,6 +34,7 @@ const getRandomColor = (currentColor: number): number => {
 
 export default function ProjectClient({ project, prevProject, nextProject }: ProjectClientProps) {
   const [currentColor, setCurrentColor] = useState(Math.floor(Math.random() * colors.length))
+  const fields = project.fields as ProjectFields
   
   // Simplified text color logic
   const textColor = currentColor === 4 ? 'text-signals-navy' : 'text-white'
@@ -41,6 +44,28 @@ export default function ProjectClient({ project, prevProject, nextProject }: Pro
     setCurrentColor(getRandomColor(currentColor))
   }
 
+  const processedImages = fields.images?.map((image: Asset) => {
+    const imageDetails = image.fields.file.details.image
+    return {
+      url: `https:${image.fields.file.url}`,
+      width: imageDetails?.width || 0,
+      height: imageDetails?.height || 0,
+      title: image.fields.title || '',
+      description: image.fields.description || '',
+      filename: image.fields.file.fileName
+    }
+  })
+  .sort((a, b) => {
+    // Extract numbers from filenames
+    const aMatch = a.filename.match(/(\d+)\.[^.]+$/)
+    const bMatch = b.filename.match(/(\d+)\.[^.]+$/)
+    const aNum = aMatch ? parseInt(aMatch[1]) : 0
+    const bNum = bMatch ? parseInt(bMatch[1]) : 0
+    return aNum - bNum
+  })
+  .map(({ filename, ...image }) => image) // Remove filename from final object
+  || []
+
   return (
     <PageLayout bgColor={colors[currentColor]} textColor={textColor} hoverClass={hoverClass}>
       {/* Project info section - reduced margin */}
@@ -49,15 +74,15 @@ export default function ProjectClient({ project, prevProject, nextProject }: Pro
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Icon icon="octicon:book-24" className={`w-5 h-5 md:w-6 md:h-6 ${textColor}`} />
-            <h1 className={`text-lg md:text-xl font-extralight ${textColor}`}>{project.fields.title}</h1>
+            <h1 className={`text-lg md:text-xl font-extralight ${textColor}`}>{fields.title}</h1>
           </div>
-          <p className={`text-lg md:text-xl font-extralight ${textColor}`}>{project.fields.year}</p>
+          <p className={`text-lg md:text-xl font-extralight ${textColor}`}>{fields.year}</p>
         </div>
 
         {/* Right side - Author and category */}
         <div className="text-right">
-          <h2 className={`text-lg md:text-xl font-extralight ${textColor} mb-1`}>{project.fields.author}</h2>
-          <p className={`text-lg md:text-xl font-extralight ${textColor}`}>{project.fields.category}</p>
+          <h2 className={`text-lg md:text-xl font-extralight ${textColor} mb-1`}>{fields.author}</h2>
+          <p className={`text-lg md:text-xl font-extralight ${textColor}`}>{fields.category}</p>
         </div>
       </div>
 
@@ -65,26 +90,7 @@ export default function ProjectClient({ project, prevProject, nextProject }: Pro
       <div className="relative">
         <ImageCarousel 
           onColorChange={handleColorChange} 
-          images={project.fields.images
-            ?.map((image: any) => ({
-              url: `https:${image.fields.file.url}`,
-              width: image.fields.file.details.image.width,
-              height: image.fields.file.details.image.height,
-              title: image.fields.title,
-              description: image.fields.description,
-              filename: image.fields.file.fileName
-            }))
-            .sort((a, b) => {
-              // Extract numbers from filenames
-              const aMatch = a.filename.match(/(\d+)\.[^.]+$/)
-              const bMatch = b.filename.match(/(\d+)\.[^.]+$/)
-              const aNum = aMatch ? parseInt(aMatch[1]) : 0
-              const bNum = bMatch ? parseInt(bMatch[1]) : 0
-              return aNum - bNum
-            })
-            .map(({ filename, ...image }) => image) // Remove filename from final object
-            || []
-          }
+          images={processedImages}
         />
       </div>
 
@@ -108,7 +114,7 @@ export default function ProjectClient({ project, prevProject, nextProject }: Pro
             >
               <Icon icon="octicon:arrow-left-24" className={`w-5 h-5 md:w-6 md:h-6 ${textColor}`} />
               <span className="text-lg md:text-xl font-extralight rotate-180 transform origin-center">
-                {prevProject.fields.title}
+                {(prevProject.fields as ProjectFields).title}
               </span>
             </Link>
           )}
@@ -117,7 +123,7 @@ export default function ProjectClient({ project, prevProject, nextProject }: Pro
               href={`/projects/${nextProject.sys.id}`}
               className={`flex items-center gap-2 ${textColor} ${hoverClass} transition-all duration-300`}
             >
-              <span className="text-lg md:text-xl font-extralight">{nextProject.fields.title}</span>
+              <span className="text-lg md:text-xl font-extralight">{(nextProject.fields as ProjectFields).title}</span>
               <Icon icon="octicon:arrow-right-24" className={`w-5 h-5 md:w-6 md:h-6 ${textColor}`} />
             </Link>
           )}
