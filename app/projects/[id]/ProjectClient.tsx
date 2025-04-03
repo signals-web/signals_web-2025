@@ -8,6 +8,14 @@ import ImageCarousel from '../../components/ImageCarousel'
 import { Project, ProjectFields } from '@/lib/contentful'
 import { Asset } from 'contentful'
 
+interface CarouselImage {
+  url: string
+  width: number
+  height: number
+  title?: string
+  description?: string
+}
+
 // Tailwind colors to cycle through - simplified list
 const colors = [
   'bg-signals-red',
@@ -44,27 +52,24 @@ export default function ProjectClient({ project, prevProject, nextProject }: Pro
     setCurrentColor(getRandomColor(currentColor))
   }
 
-  const processedImages = fields.images?.map((image: Asset) => {
-    const imageDetails = image.fields.file.details.image
+  const processedImages: CarouselImage[] = fields.images?.map((image: Asset) => {
+    const file = image.fields.file
+    const details = file.details as { image: { width: number; height: number } }
+    
     return {
-      url: `https:${image.fields.file.url}`,
-      width: imageDetails?.width || 0,
-      height: imageDetails?.height || 0,
-      title: image.fields.title || '',
-      description: image.fields.description || '',
-      filename: image.fields.file.fileName
+      url: `https:${file.url}`,
+      width: details.image?.width || 800,
+      height: details.image?.height || 600,
+      title: typeof image.fields.title === 'string' ? image.fields.title : undefined,
+      description: typeof image.fields.description === 'string' ? image.fields.description : undefined
     }
   })
   .sort((a, b) => {
-    // Extract numbers from filenames
-    const aMatch = a.filename.match(/(\d+)\.[^.]+$/)
-    const bMatch = b.filename.match(/(\d+)\.[^.]+$/)
-    const aNum = aMatch ? parseInt(aMatch[1]) : 0
-    const bNum = bMatch ? parseInt(bMatch[1]) : 0
+    // Sort by filename if available in the URL
+    const aNum = parseInt(a.url.match(/(\d+)\.[^.]+$/)?.[1] || '0')
+    const bNum = parseInt(b.url.match(/(\d+)\.[^.]+$/)?.[1] || '0')
     return aNum - bNum
-  })
-  .map(({ filename, ...image }) => image) // Remove filename from final object
-  || []
+  }) || []
 
   return (
     <PageLayout bgColor={colors[currentColor]} textColor={textColor} hoverClass={hoverClass}>
