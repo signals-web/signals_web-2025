@@ -1,4 +1,4 @@
-import { createClient, Entry, Asset as ContentfulAsset, EntryCollection } from 'contentful'
+import { createClient, Entry, Asset as ContentfulAsset } from 'contentful'
 
 const client = createClient({
   space: process.env.CONTENTFUL_SPACE_ID!,
@@ -18,13 +18,14 @@ export interface ProjectFields {
 
 export type Project = Entry<ProjectFields>
 
-export async function getProjects(): Promise<Project[]> {
+export async function getProjects() {
   const response = await client.getEntries<ProjectFields>({
     content_type: 'project',
     include: 2
   })
 
   return response.items.sort((a, b) => {
+    if (!a.fields || !b.fields) return 0
     const yearA = a.fields.year || ''
     const yearB = b.fields.year || ''
     const yearCompare = yearA.localeCompare(yearB)
@@ -32,7 +33,7 @@ export async function getProjects(): Promise<Project[]> {
   })
 }
 
-export async function getProjectsByType(type: 'Book' | 'Sign'): Promise<Project[]> {
+export async function getProjectsByType(type: 'Book' | 'Sign') {
   const response = await client.getEntries<ProjectFields>({
     content_type: 'project',
     'fields.type': type,
@@ -40,6 +41,7 @@ export async function getProjectsByType(type: 'Book' | 'Sign'): Promise<Project[
   })
 
   return response.items.sort((a, b) => {
+    if (!a.fields || !b.fields) return 0
     const yearA = a.fields.year || ''
     const yearB = b.fields.year || ''
     const yearCompare = yearA.localeCompare(yearB)

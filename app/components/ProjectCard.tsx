@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Project } from '@/lib/contentful'
+import { Project, ProjectFields } from '@/lib/contentful'
 import Link from 'next/link'
 
 interface ProjectCardProps {
@@ -9,7 +9,7 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
-  const { title, type, year, author, category, description } = project.fields
+  const fields = project.fields as ProjectFields
 
   return (
     <Link 
@@ -19,30 +19,30 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       <div className="space-y-4">
         <div className="flex justify-between items-start">
           <h3 className="text-xl font-medium text-neutral-900 group-hover:text-black">
-            {title}
+            {fields.title}
           </h3>
           <span className="text-sm text-neutral-500">
-            {year}
+            {fields.year}
           </span>
         </div>
         
-        {author && (
+        {fields.author && (
           <p className="text-neutral-600">
-            {author}
+            {fields.author}
           </p>
         )}
 
         <div className="flex gap-2 text-sm">
           <span className="px-2 py-1 bg-neutral-100 text-neutral-700 rounded-full">
-            {type}
+            {fields.type}
           </span>
           <span className="px-2 py-1 bg-neutral-100 text-neutral-700 rounded-full">
-            {category}
+            {fields.category}
           </span>
         </div>
 
         <p className="text-neutral-600 line-clamp-2">
-          {description}
+          {fields.description}
         </p>
       </div>
     </Link>
