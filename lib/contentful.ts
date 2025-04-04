@@ -1,5 +1,5 @@
 import { createClient, Entry } from 'contentful'
-import { ProjectSkeleton, IProjectFields, AboutPageSkeleton } from './contentful-types'
+import { ProjectSkeleton, IProjectFields, AboutPageSkeleton, ProjectQuery } from './contentful-types'
 
 const client = createClient({
   space: process.env.CONTENTFUL_SPACE_ID!,
@@ -18,10 +18,11 @@ export async function getProjects(): Promise<Entry<ProjectSkeleton>[]> {
 }
 
 export async function getProjectsByType(type: 'Book' | 'Sign'): Promise<Entry<ProjectSkeleton>[]> {
-  const response = await client.getEntries<ProjectSkeleton>({
+  const query: ProjectQuery = {
     content_type: 'project',
-    'fields.type': type,
-  })
+    'fields.type': type
+  }
+  const response = await client.getEntries<ProjectSkeleton>(query)
   return response.items
 }
 
