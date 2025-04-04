@@ -1,5 +1,5 @@
 import { createClient, Entry } from 'contentful'
-import { ProjectSkeleton, IProjectFields } from './contentful-types'
+import { ProjectSkeleton, IProjectFields, AboutPageSkeleton } from './contentful-types'
 
 const client = createClient({
   space: process.env.CONTENTFUL_SPACE_ID!,
@@ -10,19 +10,30 @@ const client = createClient({
 export type Project = Entry<ProjectSkeleton>
 export type ProjectFields = IProjectFields
 
-export async function getProjects(): Promise<Project[]> {
-  const response = await client.getEntries({
-    content_type: 'project'
+export async function getProjects(): Promise<Entry<ProjectSkeleton>[]> {
+  const response = await client.getEntries<ProjectSkeleton>({
+    content_type: 'project',
   })
-
-  return response.items as Project[]
+  return response.items
 }
 
-export async function getProjectsByType(type: 'Book' | 'Sign'): Promise<Project[]> {
-  const response = await client.getEntries({
+export async function getProjectsByType(type: 'Book' | 'Sign'): Promise<Entry<ProjectSkeleton>[]> {
+  const response = await client.getEntries<ProjectSkeleton>({
     content_type: 'project',
-    'fields.type': type
+    'fields.type': type,
   })
+  return response.items
+}
 
-  return response.items as Project[]
+export async function getAboutPage(): Promise<Entry<AboutPageSkeleton>> {
+  const response = await client.getEntries<AboutPageSkeleton>({
+    content_type: 'aboutPage',
+    limit: 1,
+  })
+  
+  if (!response.items.length) {
+    throw new Error('No about page found')
+  }
+
+  return response.items[0]
 }

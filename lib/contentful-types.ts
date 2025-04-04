@@ -22,4 +22,37 @@ export type Project = Entry<ProjectSkeleton>;
 export interface ProjectQuery {
   content_type: 'project';
   'fields.type'?: 'Book' | 'Sign';
+}
+
+// About Page Types
+export interface IServiceFields {
+  title: string;
+  description: string;
+}
+
+export interface ServiceSkeleton extends EntrySkeletonType {
+  contentTypeId: 'service';
+  fields: IServiceFields;
+}
+
+export interface IClientCategoryFields {
+  title: string;
+  clients: string;
+}
+
+export interface ClientCategorySkeleton extends EntrySkeletonType {
+  contentTypeId: 'clientCategory';
+  fields: IClientCategoryFields;
+}
+
+export interface IAboutPageFields {
+  introduction: string;
+  services: Entry<ServiceSkeleton>[];
+  bioText: string[];
+  clientCategories: Entry<ClientCategorySkeleton>[];
+}
+
+export interface AboutPageSkeleton extends EntrySkeletonType {
+  contentTypeId: 'aboutPage';
+  fields: IAboutPageFields;
 } 

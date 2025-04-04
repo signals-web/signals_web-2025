@@ -79,19 +79,17 @@ export default async function HomePage({
                       className="w-full h-full"
                     />
                   </span>
-                  <span className="relative text-xl md:text-[2.8rem] font-extralight whitespace-nowrap">
+                  <span className="relative text-xl md:text-[2.5rem] font-extralight whitespace-nowrap">
                     <span className="relative z-10 group-hover:mix-blend-difference">{fields.title}</span>
                     {index < allProjects.length - 1 && <span className="relative z-10 group-hover:mix-blend-difference">,&nbsp;</span>}
                     {fields.coverImage && (
                       <div 
-                        className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none overflow-hidden"
+                        className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none overflow-hidden"
                         style={{
-                          width: `${fields.title.length * 2.8}rem`,
-                          height: `${fields.title.length * 1.8}rem`,
-                          minWidth: '200px',
-                          minHeight: '133px',
-                          maxWidth: '400px',
-                          maxHeight: '267px'
+                          width: `${fields.title.length * 1.6}rem`,
+                          height: `${fields.title.length * 1.1}rem`,
+                          minWidth: '160px',
+                          minHeight: '120px'
                         }}
                       >
                         <Image
