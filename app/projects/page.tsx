@@ -39,7 +39,7 @@ export default async function ProjectsPage({
           <span className="inline-block w-8 h-8 md:w-10 md:h-10 text-signals-navy">
             <Icon icon="octicon:issue-opened-24" className="w-full h-full" />
           </span>
-          <span className="text-xl md:text-[2.8rem] font-extralight">All</span>
+          <span className="text-xl md:text-[2.8rem] font-light">All</span>
         </Link>
         <Link 
           href="/projects?type=Book"
@@ -48,7 +48,7 @@ export default async function ProjectsPage({
           <span className="inline-block w-8 h-8 md:w-10 md:h-10 text-signals-navy">
             <Icon icon="octicon:book-24" className="w-full h-full" />
           </span>
-          <span className="text-xl md:text-[2.8rem] font-extralight">Books</span>
+          <span className="text-xl md:text-[2.8rem] font-light">Books</span>
         </Link>
         <Link 
           href="/projects?type=Sign"
@@ -57,7 +57,7 @@ export default async function ProjectsPage({
           <span className="inline-block w-8 h-8 md:w-10 md:h-10 text-signals-navy">
             <Icon icon="octicon:bookmark-24" className="w-full h-full" />
           </span>
-          <span className="text-xl md:text-[2.8rem] font-extralight">Signs</span>
+          <span className="text-xl md:text-[2.8rem] font-light">Signs</span>
         </Link>
       </nav>
 
@@ -99,8 +99,8 @@ export default async function ProjectsPage({
                       />
                     )}
                   </div>
-                  <h2 className="text-lg font-extralight text-white">{fields.title}</h2>
-                  <span className="text-lg font-extralight text-white">{fields.year}</span>
+                  <h2 className="text-lg font-light text-white">{fields.title}</h2>
+                  <span className="text-lg font-light text-white">{fields.year}</span>
                 </div>
 
                 {/* Tags */}
@@ -109,7 +109,7 @@ export default async function ProjectsPage({
                     {fields.tags.map(tag => (
                       <span 
                         key={tag} 
-                        className="text-lg font-extralight px-2 py-1 bg-white/10 text-white"
+                        className="text-lg font-light px-2 py-1 bg-white/10 text-white"
                       >
                         {tag}
                       </span>
