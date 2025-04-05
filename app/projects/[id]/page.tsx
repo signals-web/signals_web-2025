@@ -1,6 +1,7 @@
 import React from 'react'
 import { getProjects } from '@/lib/contentful'
 import ProjectClient from './ProjectClient'
+import { ProjectFields } from '@/lib/contentful'
 
 export const revalidate = 60
 
@@ -11,11 +12,17 @@ interface Props {
 }
 
 export default async function ProjectPage({ params }: Props) {
-  const projects = await getProjects()
+  const allProjects = await getProjects()
   
-  // Find current project and its index
-  const currentIndex = projects.findIndex(p => p.sys.id === params.id)
-  const project = projects[currentIndex]
+  // Filter projects to only include those with images
+  const projectsWithImages = allProjects.filter(project => {
+    const fields = project.fields as ProjectFields
+    return fields.images && fields.images.length > 0
+  })
+  
+  // Find current project and its index in the filtered list
+  const currentIndex = projectsWithImages.findIndex(p => p.sys.id === params.id)
+  const project = projectsWithImages[currentIndex]
 
   if (!project) {
     return (
@@ -25,9 +32,9 @@ export default async function ProjectPage({ params }: Props) {
     )
   }
 
-  // Get previous and next projects
-  const prevProject = currentIndex > 0 ? projects[currentIndex - 1] : undefined
-  const nextProject = currentIndex < projects.length - 1 ? projects[currentIndex + 1] : undefined
+  // Get previous and next projects from the filtered list
+  const prevProject = currentIndex > 0 ? projectsWithImages[currentIndex - 1] : undefined
+  const nextProject = currentIndex < projectsWithImages.length - 1 ? projectsWithImages[currentIndex + 1] : undefined
 
   return <ProjectClient 
     project={project}
