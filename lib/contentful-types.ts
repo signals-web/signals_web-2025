@@ -11,6 +11,7 @@ export interface IProjectFields {
   images: any[];
   hasAward?: boolean;
   awardUrl?: string;
+  tags?: string[];
 }
 
 export interface ProjectSkeleton extends EntrySkeletonType {
