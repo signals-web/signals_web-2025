@@ -14,11 +14,17 @@ interface Props {
 export default async function ProjectPage({ params }: Props) {
   const allProjects = await getProjects()
   
-  // Filter projects to only include those with images
-  const projectsWithImages = allProjects.filter(project => {
-    const fields = project.fields as ProjectFields
-    return fields.images && fields.images.length > 0
-  })
+  // Filter projects to only include those with images and sort alphabetically
+  const projectsWithImages = allProjects
+    .filter(project => {
+      const fields = project.fields as ProjectFields
+      return fields.images && fields.images.length > 0
+    })
+    .sort((a, b) => {
+      const fieldsA = a.fields as ProjectFields
+      const fieldsB = b.fields as ProjectFields
+      return fieldsA.title.localeCompare(fieldsB.title)
+    })
   
   // Find current project and its index in the filtered list
   const currentIndex = projectsWithImages.findIndex(p => p.sys.id === params.id)
