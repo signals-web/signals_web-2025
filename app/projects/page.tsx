@@ -8,14 +8,19 @@ import { slugify } from '@/lib/utils'
 
 export const revalidate = 60
 
-export default async function ProjectsPage() {
+export default async function ProjectsPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined }
+}) {
   const projects = await getProjects()
+  const type = typeof searchParams.type === 'string' ? searchParams.type as 'Book' | 'Sign' : undefined
   
   // Filter and sort projects
   const sortedProjects = projects
     .filter(project => {
       const fields = project.fields as ProjectFields
-      return fields.coverImage // Only show projects with cover images
+      return fields.coverImage && (!type || fields.type === type) // Filter by type if specified
     })
     .sort((a, b) => {
       const fieldsA = a.fields as ProjectFields
@@ -25,6 +30,37 @@ export default async function ProjectsPage() {
 
   return (
     <PageLayout>
+      {/* Type Filter Navigation */}
+      <nav className="flex gap-8 md:gap-12 mb-12">
+        <Link 
+          href="/projects"
+          className={`inline-flex items-center gap-3 hover:text-signals-navy transition-all duration-300 ${!type ? 'text-white' : 'text-signals-navy'}`}
+        >
+          <span className="inline-block w-8 h-8 md:w-10 md:h-10 text-signals-navy">
+            <Icon icon="octicon:issue-opened-24" className="w-full h-full" />
+          </span>
+          <span className="text-xl md:text-[2.8rem] font-extralight">All</span>
+        </Link>
+        <Link 
+          href="/projects?type=Book"
+          className={`inline-flex items-center gap-3 hover:text-signals-navy transition-all duration-300 ${type === 'Book' ? 'text-white' : 'text-signals-navy'}`}
+        >
+          <span className="inline-block w-8 h-8 md:w-10 md:h-10 text-signals-navy">
+            <Icon icon="octicon:book-24" className="w-full h-full" />
+          </span>
+          <span className="text-xl md:text-[2.8rem] font-extralight">Books</span>
+        </Link>
+        <Link 
+          href="/projects?type=Sign"
+          className={`inline-flex items-center gap-3 hover:text-signals-navy transition-all duration-300 ${type === 'Sign' ? 'text-white' : 'text-signals-navy'}`}
+        >
+          <span className="inline-block w-8 h-8 md:w-10 md:h-10 text-signals-navy">
+            <Icon icon="octicon:bookmark-24" className="w-full h-full" />
+          </span>
+          <span className="text-xl md:text-[2.8rem] font-extralight">Signs</span>
+        </Link>
+      </nav>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12">
         {sortedProjects.map(project => {
           const fields = project.fields as ProjectFields
@@ -41,7 +77,7 @@ export default async function ProjectsPage() {
                     src={`https:${fields.coverImage.fields.file.url}`}
                     alt={fields.title}
                     fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="object-cover"
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                   />
                 )}
@@ -59,12 +95,12 @@ export default async function ProjectsPage() {
                     {fields.hasAward && (
                       <Icon 
                         icon="material-symbols-light:award-star-outline-rounded"
-                        className="w-5 h-5 text-signals-red"
+                        className="w-5 h-5 text-white"
                       />
                     )}
                   </div>
-                  <h2 className="text-lg font-extralight text-white group-hover:text-signals-red transition-colors">{fields.title}</h2>
-                  <span className="text-sm text-white/60 font-extralight">{fields.year}</span>
+                  <h2 className="text-lg font-extralight text-white">{fields.title}</h2>
+                  <span className="text-lg font-extralight text-white">{fields.year}</span>
                 </div>
 
                 {/* Tags */}
@@ -73,7 +109,7 @@ export default async function ProjectsPage() {
                     {fields.tags.map(tag => (
                       <span 
                         key={tag} 
-                        className="text-xs font-extralight px-2 py-1 bg-white/10 text-white"
+                        className="text-lg font-extralight px-2 py-1 bg-white/10 text-white"
                       >
                         {tag}
                       </span>
