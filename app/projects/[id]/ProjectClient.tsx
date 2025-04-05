@@ -7,6 +7,7 @@ import PageLayout from '../../components/PageLayout'
 import ImageCarousel from '../../components/ImageCarousel'
 import { Project, ProjectFields } from '@/lib/contentful'
 import { Asset } from 'contentful'
+import ReactMarkdown from 'react-markdown'
 
 interface CarouselImage {
   url: string
@@ -170,8 +171,8 @@ export default function ProjectClient({ project, prevProject, nextProject }: Pro
         >
           <div className="h-full flex items-center justify-center">
             <div className="p-8 max-w-4xl">
-              <div className="text-xl md:text-[2.5rem] text-white font-extralight whitespace-pre-wrap leading-relaxed">
-                {fields.description}
+              <div className="text-xl md:text-[2.5rem] text-white font-extralight leading-relaxed">
+                <ReactMarkdown>{fields.description}</ReactMarkdown>
               </div>
             </div>
           </div>
