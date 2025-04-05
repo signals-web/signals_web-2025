@@ -71,7 +71,7 @@ export default async function HomePage({
               <div className="relative inline group">
                 <Link 
                   href={`/projects/${project.sys.id}`}
-                  className="inline-flex items-center gap-2 hover:text-signals-navy transition-all duration-300"
+                  className={`inline-flex items-center gap-2 hover:text-signals-navy transition-all duration-300 ${!fields.coverImage ? 'text-signals-navy' : ''}`}
                 >
                   <span className="inline-block w-8 h-8 md:w-10 md:h-10 text-signals-navy">
                     <Icon 
@@ -80,9 +80,9 @@ export default async function HomePage({
                     />
                   </span>
                   <span className="relative text-xl md:text-[2.5rem] font-extralight whitespace-nowrap">
-                    <span className="relative z-10 group-hover:mix-blend-difference">{fields.title}</span>
-                    {index < allProjects.length - 1 && <span className="relative z-10 group-hover:mix-blend-difference">,&nbsp;</span>}
-                    {fields.coverImage && (
+                    <span className="relative z-10 group-hover:opacity-0 transition-opacity duration-300">{fields.title}</span>
+                    {index < allProjects.length - 1 && <span className="relative z-10 group-hover:opacity-0 transition-opacity duration-300">,&nbsp;</span>}
+                    {fields.coverImage ? (
                       <div 
                         className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none overflow-hidden"
                         style={{
@@ -99,6 +99,12 @@ export default async function HomePage({
                           className="object-cover"
                           sizes="(max-width: 400px) 100vw, 400px"
                         />
+                      </div>
+                    ) : (
+                      <div 
+                        className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none"
+                      >
+                        <span className="text-xl md:text-[2.5rem] text-signals-navy font-extralight">On the boards</span>
                       </div>
                     )}
                   </span>
