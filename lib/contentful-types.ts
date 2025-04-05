@@ -9,6 +9,8 @@ export interface IProjectFields {
   description: string;
   coverImage: any;
   images: any[];
+  hasAward?: boolean;
+  awardUrl?: string;
 }
 
 export interface ProjectSkeleton extends EntrySkeletonType {

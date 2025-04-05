@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import PageLayout from '../../components/PageLayout'
@@ -42,8 +42,20 @@ const getRandomColor = (currentColor: number): number => {
 
 export default function ProjectClient({ project, prevProject, nextProject }: ProjectClientProps) {
   const [currentColor, setCurrentColor] = useState(Math.floor(Math.random() * colors.length))
+  const [showTextModal, setShowTextModal] = useState(true)
   const fields = project.fields as ProjectFields
   
+  // Auto-hide text modal after 5 seconds
+  useEffect(() => {
+    if (showTextModal) {
+      const timer = setTimeout(() => {
+        setShowTextModal(false)
+      }, 5000)
+      
+      return () => clearTimeout(timer)
+    }
+  }, [showTextModal])
+
   // Simplified text color logic
   const textColor = currentColor === 4 ? 'text-signals-navy' : 'text-white'
   const hoverClass = currentColor === 4 ? 'hover:text-signals-slate' : 'hover:opacity-80'
@@ -97,6 +109,73 @@ export default function ProjectClient({ project, prevProject, nextProject }: Pro
           onColorChange={handleColorChange} 
           images={processedImages}
         />
+
+        {/* Text toggle button and award */}
+        <div className="absolute left-4 top-4 z-20 flex flex-col items-center gap-2">
+          <button
+            onClick={() => setShowTextModal(!showTextModal)}
+            className="p-3 hover:bg-white/5 transition-colors flex flex-col items-center"
+            aria-label={showTextModal ? "Hide project text" : "Show project text"}
+          >
+            <Icon 
+              icon={showTextModal ? "octicon:x-24" : "octicon:note-24"}
+              className={`w-8 h-8 ${showTextModal ? 'text-white' : 'text-signals-red'}`}
+            />
+            <span className={`text-sm mt-1 font-light transition-all duration-300 ease-in-out opacity-100 ${
+              showTextModal ? 'text-white' : 'text-signals-red'
+            }`}>
+              {showTextModal ? 'CLOSE' : 'ABOUT'}
+            </span>
+          </button>
+          
+          {fields.hasAward && (
+            fields.awardUrl ? (
+              <a 
+                href={fields.awardUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 flex flex-col items-center hover:bg-white/5 transition-colors"
+              >
+                <Icon 
+                  icon="material-symbols-light:award-star-outline-rounded"
+                  className={`w-8 h-8 ${showTextModal ? 'text-white' : 'text-signals-red'}`}
+                />
+                <span className={`text-sm mt-1 font-light transition-all duration-300 ease-in-out opacity-100 ${
+                  showTextModal ? 'text-white' : 'text-signals-red'
+                }`}>
+                  AWARD
+                </span>
+              </a>
+            ) : (
+              <div className="p-3 flex flex-col items-center">
+                <Icon 
+                  icon="material-symbols-light:award-star-outline-rounded"
+                  className={`w-8 h-8 ${showTextModal ? 'text-white' : 'text-signals-red'}`}
+                />
+                <span className={`text-sm mt-1 font-light transition-all duration-300 ease-in-out opacity-100 ${
+                  showTextModal ? 'text-white' : 'text-signals-red'
+                }`}>
+                  AWARD
+                </span>
+              </div>
+            )
+          )}
+        </div>
+
+        {/* Text modal sheet */}
+        <div 
+          className={`absolute inset-0 transition-all duration-500 ease-in-out z-10 ${colors[currentColor]} ${
+            showTextModal ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
+        >
+          <div className="h-full flex items-center justify-center">
+            <div className="p-8 max-w-4xl">
+              <div className="text-xl md:text-[2.5rem] text-white font-extralight whitespace-pre-wrap leading-relaxed">
+                {fields.description}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Navigation footer - reduced margin */}
