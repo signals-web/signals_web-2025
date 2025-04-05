@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 
     const msg = {
       to: 'grimley@sendoutsignals.com',
-      from: 'website@sendoutsignals.com', // This needs to be a verified sender
+      from: 'grimley@sendoutsignals.com', // Using verified sender email
       replyTo: email,
       subject: `New Contact Form Submission from ${name}`,
       text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
