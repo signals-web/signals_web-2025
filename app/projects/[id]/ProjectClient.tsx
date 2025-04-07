@@ -194,7 +194,7 @@ export default function ProjectClient({ project, prevProject, nextProject }: Pro
         <div className="flex items-center gap-4 md:gap-8">
           {prevProject && (
             <Link 
-              href={`/projects/${prevProject.sys.id}`}
+              href={`/projects/${(prevProject.fields as ProjectFields).slug}`}
               className={`flex items-center gap-2 ${textColor} ${hoverClass} transition-all duration-300`}
             >
               <Icon icon="octicon:arrow-left-24" className={`w-5 h-5 md:w-6 md:h-6 ${textColor}`} />
@@ -205,7 +205,7 @@ export default function ProjectClient({ project, prevProject, nextProject }: Pro
           )}
           {nextProject && (
             <Link 
-              href={`/projects/${nextProject.sys.id}`}
+              href={`/projects/${(nextProject.fields as ProjectFields).slug}`}
               className={`flex items-center gap-2 ${textColor} ${hoverClass} transition-all duration-300`}
             >
               <span className="text-lg md:text-xl font-extralight">{(nextProject.fields as ProjectFields).title}</span>
