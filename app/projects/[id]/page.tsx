@@ -2,7 +2,6 @@ import React from 'react'
 import { getProjects, getProjectsByType } from '@/lib/contentful'
 import ProjectClient from './ProjectClient'
 import { ProjectFields } from '@/lib/contentful'
-import { slugify } from '@/lib/utils'
 import { notFound, redirect } from 'next/navigation'
 
 export const revalidate = 60
@@ -17,7 +16,7 @@ interface Props {
 export async function generateStaticParams() {
   const allProjects = await getProjects()
   return allProjects.map((project) => ({
-    id: slugify((project.fields as ProjectFields).title)
+    id: (project.fields as ProjectFields).slug
   }))
 }
 
@@ -41,14 +40,14 @@ export default async function ProjectPage({ params }: Props) {
     const project = allProjects.find(p => p.sys.id === params.id)
     if (project) {
       // Redirect to new URL format
-      redirect(`/projects/${slugify((project.fields as ProjectFields).title)}`)
+      redirect(`/projects/${(project.fields as ProjectFields).slug}`)
     }
   }
   
   // Find current project by matching the slug
   const currentIndex = allProjects.findIndex(p => {
     const fields = p.fields as ProjectFields
-    return slugify(fields.title) === params.id
+    return fields.slug === params.id
   })
   
   const project = allProjects[currentIndex]

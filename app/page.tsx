@@ -71,7 +71,7 @@ export default async function HomePage({
             <React.Fragment key={project.sys.id}>
               <div className="relative inline-block md:inline group">
                 <Link 
-                  href={`/projects/${slugify(fields.title)}`}
+                  href={`/projects/${(fields as ProjectFields).slug}`}
                   className={`inline-flex items-center gap-3 hover:text-signals-navy transition-all duration-300 ${!fields.coverImage ? 'text-signals-navy' : ''}`}
                 >
                   <span className="inline-block w-8 h-8 md:w-10 md:h-10 text-signals-navy">

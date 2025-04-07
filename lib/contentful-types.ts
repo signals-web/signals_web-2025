@@ -2,6 +2,7 @@ import { Entry, EntrySkeletonType } from 'contentful';
 
 export interface IProjectFields {
   title: string;
+  slug: string;
   type: 'Book' | 'Sign';
   year: string;
   author: string;
