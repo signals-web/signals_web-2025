@@ -2,6 +2,8 @@ import React from 'react'
 import { getProjects } from '@/lib/contentful'
 import ProjectClient from './ProjectClient'
 import { ProjectFields } from '@/lib/contentful'
+import { slugify } from '@/lib/utils'
+import { notFound } from 'next/navigation'
 
 export const revalidate = 60
 
@@ -9,6 +11,19 @@ interface Props {
   params: {
     id: string
   }
+}
+
+// Generate static paths for all projects
+export async function generateStaticParams() {
+  const allProjects = await getProjects()
+  return allProjects
+    .filter(project => {
+      const fields = project.fields as ProjectFields
+      return fields.images && fields.images.length > 0
+    })
+    .map((project) => ({
+      id: slugify((project.fields as ProjectFields).title)
+    }))
 }
 
 export default async function ProjectPage({ params }: Props) {
@@ -26,16 +41,16 @@ export default async function ProjectPage({ params }: Props) {
       return fieldsA.title.localeCompare(fieldsB.title)
     })
   
-  // Find current project and its index in the filtered list
-  const currentIndex = projectsWithImages.findIndex(p => p.sys.id === params.id)
+  // Find current project by matching the slug
+  const currentIndex = projectsWithImages.findIndex(p => {
+    const fields = p.fields as ProjectFields
+    return slugify(fields.title) === params.id
+  })
+  
   const project = projectsWithImages[currentIndex]
 
   if (!project) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FF0054]">
-        <h1 className="text-2xl font-extralight text-white">Project not found</h1>
-      </div>
-    )
+    notFound()
   }
 
   // Get previous and next projects from the filtered list
