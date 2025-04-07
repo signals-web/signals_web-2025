@@ -12,6 +12,18 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: '/projects/:id',
+        has: [
+          {
+            type: 'query',
+            key: 'redirect',
+            value: 'true'
+          }
+        ],
+        destination: '/',
+        permanent: false
+      },
+      {
         source: '/:path*',
         has: [
           {

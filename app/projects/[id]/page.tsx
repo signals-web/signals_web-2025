@@ -3,7 +3,7 @@ import { getProjects, getProjectsByType } from '@/lib/contentful'
 import ProjectClient from './ProjectClient'
 import { ProjectFields } from '@/lib/contentful'
 import { slugify } from '@/lib/utils'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 
 export const revalidate = 60
 
@@ -34,6 +34,16 @@ export default async function ProjectPage({ params }: Props) {
       const fieldsB = b.fields as ProjectFields
       return fieldsA.title.localeCompare(fieldsB.title)
     })
+  
+  // Check if this is an old URL (Contentful ID)
+  if (params.id.length === 24 && /^[A-Za-z0-9]+$/.test(params.id)) {
+    // Find project by Contentful ID
+    const project = allProjects.find(p => p.sys.id === params.id)
+    if (project) {
+      // Redirect to new URL format
+      redirect(`/projects/${slugify((project.fields as ProjectFields).title)}`)
+    }
+  }
   
   // Find current project by matching the slug
   const currentIndex = allProjects.findIndex(p => {
