@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import PageLayout from './components/PageLayout'
 import Image from 'next/image'
+import { slugify } from '@/lib/utils'
 
 export const revalidate = 60 // Revalidate every minute
 
@@ -68,10 +69,10 @@ export default async function HomePage({
           const fields = project.fields as ProjectFields
           return (
             <React.Fragment key={project.sys.id}>
-              <div className="relative inline group">
+              <div className="relative inline-block md:inline group">
                 <Link 
-                  href={`/projects/${project.sys.id}`}
-                  className={`inline-flex items-center gap-2 hover:text-signals-navy transition-all duration-300 ${!fields.coverImage ? 'text-signals-navy' : ''}`}
+                  href={`/projects/${slugify(fields.title)}`}
+                  className={`inline-flex items-center gap-3 hover:text-signals-navy transition-all duration-300 ${!fields.coverImage ? 'text-signals-navy' : ''}`}
                 >
                   <span className="inline-block w-8 h-8 md:w-10 md:h-10 text-signals-navy">
                     <Icon 
@@ -79,12 +80,12 @@ export default async function HomePage({
                       className="w-full h-full"
                     />
                   </span>
-                  <span className="relative text-xl md:text-[2.5rem] font-extralight whitespace-nowrap">
+                  <span className="relative text-3xl md:text-[2.5rem] font-extralight whitespace-normal md:whitespace-nowrap">
                     <span className="relative z-10 group-hover:opacity-0 transition-opacity duration-300">{fields.title}</span>
-                    {index < allProjects.length - 1 && <span className="relative z-10 group-hover:opacity-0 transition-opacity duration-300">,&nbsp;</span>}
+                    {index < allProjects.length - 1 && <span className="relative z-10 group-hover:opacity-0 transition-opacity duration-300 hidden md:inline">,&nbsp;</span>}
                     {fields.coverImage ? (
                       <div 
-                        className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none overflow-hidden"
+                        className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none overflow-hidden hidden md:block"
                         style={{
                           width: `${fields.title.length * 1.6}rem`,
                           height: `${fields.title.length * 1.1}rem`,
@@ -102,7 +103,7 @@ export default async function HomePage({
                       </div>
                     ) : (
                       <div 
-                        className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none"
+                        className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none hidden md:block"
                       >
                         <span className="text-xl md:text-[2.5rem] text-signals-navy font-extralight">On the boards</span>
                       </div>

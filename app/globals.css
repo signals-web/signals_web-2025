@@ -15,7 +15,7 @@
 
 @layer components {
   .project-list {
-    @apply text-white text-2xl md:text-5xl font-extralight;
+    @apply text-white text-3xl md:text-5xl font-extralight flex flex-col md:block;
     line-height: 1.5;
     word-spacing: 0.1em;
   }
