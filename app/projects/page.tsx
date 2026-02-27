@@ -4,18 +4,18 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Icon } from '@iconify/react'
 import PageLayout from '../components/PageLayout'
-import { slugify } from '@/lib/utils'
 
 export const revalidate = 60
 
 export default async function ProjectsPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
+  const resolvedSearchParams = await searchParams
   const projects = await getProjects()
-  const type = typeof searchParams.type === 'string' ? searchParams.type as 'Book' | 'Sign' : undefined
-  
+  const type = typeof resolvedSearchParams.type === 'string' ? resolvedSearchParams.type as 'Book' | 'Sign' : undefined
+
   // Filter and sort projects
   const sortedProjects = projects
     .filter(project => {
@@ -32,7 +32,7 @@ export default async function ProjectsPage({
     <PageLayout>
       {/* Type Filter Navigation */}
       <nav className="flex gap-8 md:gap-12 mb-12">
-        <Link 
+        <Link
           href="/projects"
           className={`inline-flex items-center gap-3 hover:text-signals-navy transition-all duration-300 ${!type ? 'text-white' : 'text-signals-navy'}`}
         >
@@ -41,7 +41,7 @@ export default async function ProjectsPage({
           </span>
           <span className="text-xl md:text-[2.8rem] font-light">All</span>
         </Link>
-        <Link 
+        <Link
           href="/projects?type=Book"
           className={`inline-flex items-center gap-3 hover:text-signals-navy transition-all duration-300 ${type === 'Book' ? 'text-white' : 'text-signals-navy'}`}
         >
@@ -50,7 +50,7 @@ export default async function ProjectsPage({
           </span>
           <span className="text-xl md:text-[2.8rem] font-light">Books</span>
         </Link>
-        <Link 
+        <Link
           href="/projects?type=Sign"
           className={`inline-flex items-center gap-3 hover:text-signals-navy transition-all duration-300 ${type === 'Sign' ? 'text-white' : 'text-signals-navy'}`}
         >
@@ -65,9 +65,9 @@ export default async function ProjectsPage({
         {sortedProjects.map(project => {
           const fields = project.fields as ProjectFields
           return (
-            <Link 
+            <Link
               key={project.sys.id}
-              href={`/projects/${slugify(fields.title)}`}
+              href={`/projects/${fields.slug}`}
               className="group block"
             >
               {/* Image Container */}
@@ -82,18 +82,18 @@ export default async function ProjectsPage({
                   />
                 )}
               </div>
-              
+
               {/* Project Info */}
               <div className="space-y-3">
                 {/* Title row with icons */}
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
-                    <Icon 
-                      icon={fields.type === 'Book' ? 'octicon:book-24' : 'octicon:bookmark-24'} 
+                    <Icon
+                      icon={fields.type === 'Book' ? 'octicon:book-24' : 'octicon:bookmark-24'}
                       className="w-5 h-5 text-white"
                     />
                     {fields.hasAward && (
-                      <Icon 
+                      <Icon
                         icon="material-symbols-light:award-star-outline-rounded"
                         className="w-5 h-5 text-white"
                       />
@@ -107,8 +107,8 @@ export default async function ProjectsPage({
                 {fields.tags && fields.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {fields.tags.map(tag => (
-                      <span 
-                        key={tag} 
+                      <span
+                        key={tag}
                         className="text-lg font-light px-2 py-1 bg-white/10 text-white"
                       >
                         {tag}

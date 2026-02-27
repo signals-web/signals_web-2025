@@ -4,18 +4,17 @@ import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import PageLayout from './components/PageLayout'
 import Image from 'next/image'
-import { slugify } from '@/lib/utils'
 
 export const revalidate = 60 // Revalidate every minute
 
 export default async function HomePage({
   searchParams
 }: {
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-  // Ensure type is a string or undefined
-  const type = typeof searchParams.type === 'string' ? searchParams.type : undefined
-  
+  const resolvedSearchParams = await searchParams
+  const type = typeof resolvedSearchParams.type === 'string' ? resolvedSearchParams.type : undefined
+
   const [books, signs] = await Promise.all([
     getProjectsByType('Book'),
     getProjectsByType('Sign')
@@ -35,7 +34,7 @@ export default async function HomePage({
   return (
     <PageLayout>
       <nav className="flex gap-8 md:gap-12 mb-12">
-        <Link 
+        <Link
           href="/"
           className={`inline-flex items-center gap-3 hover:text-signals-navy transition-all duration-300 ${!type ? 'text-white' : 'text-signals-navy'}`}
         >
@@ -44,7 +43,7 @@ export default async function HomePage({
           </span>
           <span className="text-xl md:text-[2.8rem] font-extralight">All</span>
         </Link>
-        <Link 
+        <Link
           href="/?type=Book"
           className={`inline-flex items-center gap-3 hover:text-signals-navy transition-all duration-300 ${type === 'Book' ? 'text-white' : 'text-signals-navy'}`}
         >
@@ -53,7 +52,7 @@ export default async function HomePage({
           </span>
           <span className="text-xl md:text-[2.8rem] font-extralight">Books</span>
         </Link>
-        <Link 
+        <Link
           href="/?type=Sign"
           className={`inline-flex items-center gap-3 hover:text-signals-navy transition-all duration-300 ${type === 'Sign' ? 'text-white' : 'text-signals-navy'}`}
         >
@@ -63,20 +62,20 @@ export default async function HomePage({
           <span className="text-xl md:text-[2.8rem] font-extralight">Signs</span>
         </Link>
       </nav>
-      
+
       <div className="project-list transition-opacity duration-300">
         {allProjects.map((project, index) => {
           const fields = project.fields as ProjectFields
           return (
             <React.Fragment key={project.sys.id}>
               <div className="relative inline-block md:inline group">
-                <Link 
+                <Link
                   href={`/projects/${(fields as ProjectFields).slug}`}
                   className={`inline-flex items-center gap-3 hover:text-signals-navy transition-all duration-300 ${!fields.coverImage ? 'text-signals-navy' : ''}`}
                 >
                   <span className="inline-block w-8 h-8 md:w-10 md:h-10 text-signals-navy">
-                    <Icon 
-                      icon={fields.type === 'Book' ? 'octicon:book-24' : 'octicon:bookmark-24'} 
+                    <Icon
+                      icon={fields.type === 'Book' ? 'octicon:book-24' : 'octicon:bookmark-24'}
                       className="w-full h-full"
                     />
                   </span>
@@ -84,7 +83,7 @@ export default async function HomePage({
                     <span className="relative z-10 group-hover:opacity-0 transition-opacity duration-300">{fields.title}</span>
                     {index < allProjects.length - 1 && <span className="relative z-10 group-hover:opacity-0 transition-opacity duration-300 hidden md:inline">,&nbsp;</span>}
                     {fields.coverImage ? (
-                      <div 
+                      <div
                         className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none overflow-hidden hidden md:block"
                         style={{
                           width: `${fields.title.length * 1.6}rem`,
@@ -102,7 +101,7 @@ export default async function HomePage({
                         />
                       </div>
                     ) : (
-                      <div 
+                      <div
                         className="absolute left-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none hidden md:block"
                       >
                         <span className="text-xl md:text-[2.5rem] text-signals-navy font-extralight">On the boards</span>

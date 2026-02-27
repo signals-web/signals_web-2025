@@ -3,12 +3,34 @@ import { getProjects, getProjectsByType } from '@/lib/contentful'
 import ProjectClient from './ProjectClient'
 import { ProjectFields } from '@/lib/contentful'
 import { notFound, redirect } from 'next/navigation'
+import type { Metadata } from 'next'
 
 export const revalidate = 60
 
 interface Props {
-  params: {
+  params: Promise<{
     id: string
+  }>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const resolvedParams = await params
+  const allProjects = await getProjects()
+  const project = allProjects.find(p => (p.fields as ProjectFields).slug === resolvedParams.id)
+
+  if (!project) return {}
+
+  const fields = project.fields as ProjectFields
+  const ogImage = fields.coverImage ? `https:${fields.coverImage.fields.file.url}` : undefined
+
+  return {
+    title: fields.title,
+    description: `Project: ${fields.title}`,
+    openGraph: {
+      title: fields.title,
+      description: `Project: ${fields.title}`,
+      images: ogImage ? [{ url: ogImage }] : [],
+    },
   }
 }
 
@@ -21,6 +43,8 @@ export async function generateStaticParams() {
 }
 
 export default async function ProjectPage({ params }: Props) {
+  const resolvedParams = await params
+
   // Fetch all projects using the same logic as homepage
   const [books, signs] = await Promise.all([
     getProjectsByType('Book'),
@@ -33,23 +57,23 @@ export default async function ProjectPage({ params }: Props) {
       const fieldsB = b.fields as ProjectFields
       return fieldsA.title.localeCompare(fieldsB.title)
     })
-  
+
   // Check if this is an old URL (Contentful ID)
-  if (params.id.length === 24 && /^[A-Za-z0-9]+$/.test(params.id)) {
+  if (resolvedParams.id.length === 24 && /^[A-Za-z0-9]+$/.test(resolvedParams.id)) {
     // Find project by Contentful ID
-    const project = allProjects.find(p => p.sys.id === params.id)
+    const project = allProjects.find(p => p.sys.id === resolvedParams.id)
     if (project) {
       // Redirect to new URL format
       redirect(`/projects/${(project.fields as ProjectFields).slug}`)
     }
   }
-  
+
   // Find current project by matching the slug
   const currentIndex = allProjects.findIndex(p => {
     const fields = p.fields as ProjectFields
-    return fields.slug === params.id
+    return fields.slug === resolvedParams.id
   })
-  
+
   const project = allProjects[currentIndex]
 
   if (!project) {
@@ -60,7 +84,7 @@ export default async function ProjectPage({ params }: Props) {
   const prevProject = currentIndex > 0 ? allProjects[currentIndex - 1] : undefined
   const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentIndex + 1] : undefined
 
-  return <ProjectClient 
+  return <ProjectClient
     project={project}
     prevProject={prevProject}
     nextProject={nextProject}
