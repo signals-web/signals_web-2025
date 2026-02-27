@@ -1,20 +1,16 @@
 import { NextResponse } from 'next/server'
-import sgMail from '@sendgrid/mail'
+import { Resend } from 'resend'
 
-// Initialize SendGrid with your API key
-if (!process.env.SENDGRID_API_KEY) {
-  throw new Error('SENDGRID_API_KEY environment variable is not set')
-}
-sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
     const { name, email, message } = body
 
-    const msg = {
-      to: 'grimley@sendoutsignals.com',
-      from: 'grimley@sendoutsignals.com', // Using verified sender email
+    const { data, error } = await resend.emails.send({
+      from: 'Signals Web <grimley@sendoutsignals.com>',
+      to: ['grimley@sendoutsignals.com'],
       replyTo: email,
       subject: `New Contact Form Submission from ${name}`,
       text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
@@ -25,10 +21,14 @@ export async function POST(request: Request) {
         <p><strong>Message:</strong></p>
         <p style="white-space: pre-wrap;">${message}</p>
       `,
+    })
+
+    if (error) {
+      console.error('Resend API error:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    await sgMail.send(msg)
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, id: data?.id })
   } catch (error) {
     console.error('Failed to process contact form:', error)
     return NextResponse.json(
