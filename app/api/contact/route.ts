@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
+// Triggering redeploy to apply new Vercel environment variables
 
 export async function POST(request: Request) {
   try {
