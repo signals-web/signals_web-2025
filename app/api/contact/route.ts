@@ -3,6 +3,11 @@ import { Resend } from 'resend'
 
 export async function POST(request: Request) {
   try {
+    if (!process.env.RESEND_API_KEY) {
+      console.error('RESEND_API_KEY is not defined')
+      return NextResponse.json({ error: 'Mail service not configured' }, { status: 500 })
+    }
+
     const resend = new Resend(process.env.RESEND_API_KEY)
     const body = await request.json()
     const { name, email, message } = body
@@ -24,14 +29,14 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error('Resend API error:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      return NextResponse.json({ error: `Resend error: ${error.message}` }, { status: 500 })
     }
 
     return NextResponse.json({ success: true, id: data?.id })
-  } catch (error) {
-    console.error('Failed to process contact form:', error)
+  } catch (err: any) {
+    console.error('Failed to process contact form:', err)
     return NextResponse.json(
-      { error: 'Failed to send message' },
+      { error: `Internal error: ${err.message || 'Unknown error'}` },
       { status: 500 }
     )
   }
