@@ -11,7 +11,19 @@ export async function POST(request: Request) {
 
     const resend = new Resend(process.env.RESEND_API_KEY)
     const body = await request.json()
-    const { name, email, message } = body
+    const { name, email, message, fax } = body
+
+    // 1. Honeypot check: If the hidden 'fax' field is filled, it's likely a bot.
+    // We return success: true but DON'T send the email to avoid tipping off the bot.
+    if (fax) {
+      console.warn('Spam submission detected via honeypot:', { name, email })
+      return NextResponse.json({ success: true, note: 'Filtered' })
+    }
+
+    // 2. Basic validation
+    if (!name || name.length < 2 || !email || !message || message.length < 10) {
+      return NextResponse.json({ error: 'Invalid submission data' }, { status: 400 })
+    }
 
     const { data, error } = await resend.emails.send({
       from: 'Signals Web <grimley@sendoutsignals.com>',

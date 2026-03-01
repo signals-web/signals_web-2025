@@ -7,6 +7,7 @@ type FormData = {
   name: string;
   email: string;
   message: string;
+  fax?: string; // Honeypot field
 }
 
 export default function ContactForm() {
@@ -17,7 +18,7 @@ export default function ContactForm() {
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true)
     setSubmitStatus('idle')
-    
+
     try {
       // You'll need to set up an API route to handle this
       const response = await fetch('/api/contact', {
@@ -32,7 +33,7 @@ export default function ContactForm() {
       })
 
       if (!response.ok) throw new Error('Failed to send message')
-      
+
       setSubmitStatus('success')
       reset()
     } catch (error) {
@@ -45,6 +46,19 @@ export default function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <div className="hidden" aria-hidden="true">
+        <label htmlFor="fax" className="block text-base md:text-[1.25rem] font-light mb-2">
+          Fax (Leave empty)
+        </label>
+        <input
+          {...register("fax")}
+          type="text"
+          id="fax"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
+
       <div>
         <label htmlFor="name" className="block text-base md:text-[1.25rem] font-light mb-2">
           Name
@@ -63,7 +77,7 @@ export default function ContactForm() {
           Email
         </label>
         <input
-          {...register("email", { 
+          {...register("email", {
             required: "Email is required",
             pattern: {
               value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -93,7 +107,7 @@ export default function ContactForm() {
       {submitStatus === 'success' && (
         <p className="text-signals-navy font-light">Message sent successfully!</p>
       )}
-      
+
       {submitStatus === 'error' && (
         <p className="text-signals-red font-light">Failed to send message. Please try again.</p>
       )}
